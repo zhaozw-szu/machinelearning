@@ -45,13 +45,17 @@ class Momentum(Optimizer):
         self._floor, self._ceiling = floor, ceiling
         self._is_nesterov = False
 
+    # lr*d*w = lr*dw + pv(t)
+    # velocity:v(t-1)
     def run(self, i, dw):
         dw *= self.lr
         velocity = self._cache
         velocity[i] *= self._momentum
         velocity[i] += dw
+        # 如果不是Nesterov Momentum Update，直接把v(t)当作更新步伐
         if not self._is_nesterov:
             return velocity[i]
+        # 否则，调用公式 pv(t)-lr*dw
         return self._momentum * velocity[i] + dw
 
     def update(self):

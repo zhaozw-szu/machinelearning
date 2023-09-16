@@ -86,10 +86,14 @@ class CostLayer(Layer):
     def _derivative(self, y, delta=None):
         pass
 
+    # 计算整合梯度的方法，返回的是负梯度
     def bp_first(self, y, y_pred):
+        # 如果是第六节第二、第三种情况则使用-delta（m）=-（v（m）-y）=y-v（m）的计算方法
         if self._cost_function_name == "CrossEntropy" and (
                 self._transform == "Softmax" or self._transform == "Sigmoid"):
             return y - y_pred
+        # 否则使用普适性公式进行计算
+        # -delta（m）=-（损失对v（m）求偏导）或-delta（m）=-（损失对v（m）求偏导）*（激活函数的导数）
         dy = -self._cost_function(y, y_pred)
         if self._transform_function is None:
             return dy

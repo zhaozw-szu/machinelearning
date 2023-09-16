@@ -177,3 +177,11 @@ class DataUtil:
         if not one_hot:
             return xs, ys
         return xs, DataUtil.get_one_hot(ys, n_class)
+
+    @staticmethod
+    def gen_random(size=100, n_dim=2, n_class=2, scale=1, one_hot=True):
+        xs = np.random.randn(size, n_dim).astype(np.float32) * scale
+        ys = np.random.randint(n_class, size=size).astype(np.int8)
+        if not one_hot:
+            return xs, ys
+        return xs, DataUtil.get_one_hot(ys, n_class)

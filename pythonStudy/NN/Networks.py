@@ -21,8 +21,9 @@ class NaiveNN(ClassifierBase):
         super(NaiveNN, self).__init__(**kwargs)
         # 记录所有的Layer、权值矩阵、偏置量
         self._layers, self._weights, self._bias = [], [], []
+        # 记录权值、偏移量的优化器
         self._w_optimizer = self._b_optimizer = None
-        # 记录
+        # 记录当前最后一个Layer所含的神经元
         self._current_dimension = 0
 
         self._params["lr"] = kwargs.get("lr", 0.001)
@@ -72,7 +73,9 @@ class NaiveNN(ClassifierBase):
 
     def add(self, layer):
         if not self._layers:
+            # 如果第一次加入layer，则初始化相应的属性
             self._layers, self._current_dimension = [layer], layer.shape[1]
+            # 初始化权值矩阵和偏移量
             self._add_params(layer.shape)
         else:
             nxt = layer.shape[0]
@@ -86,12 +89,16 @@ class NaiveNN(ClassifierBase):
             epoch = self._params["epoch"]
         if optimizer is None:
             optimizer = self._params["optimizer"]
+        # 初始化优化器
         self._init_optimizers(optimizer, lr, epoch)
         layer_width = len(self._layers)
+        # 主循环
         for counter in range(epoch):
             self._w_optimizer.update()
             self._b_optimizer.update()
+            # 调用前向传导算法
             activations = self._get_activations(x)
+            # 调用CostLayer的bp_first方法来进行bp算法的第一步
             deltas = [self._layers[-1].bp_first(y, activations[-1])]
             for i in range(-1, -len(activations), -1):
                 deltas.append(self._layers[i - 1].bp(
